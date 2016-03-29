@@ -41,7 +41,7 @@ public class HttpTester {
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	HttpTester tester = new HttpTester("http://"+ args[1] + ":" + args[2] + "/");
+    	HttpTester tester = new HttpTester("http://"+ args[0] + ":" + args[1] + "/");
     	
         try 
         {
