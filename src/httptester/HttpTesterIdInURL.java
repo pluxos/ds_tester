@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -31,17 +34,17 @@ import org.apache.http.util.EntityUtils;
  * This example demonstrates the use of the {@link ResponseHandler} to simplify
  * the process of processing the HTTP response and releasing associated resources.
  */
-public class HttpTester {
+public class HttpTesterIdInURL {
     private CloseableHttpClient httpclient;
 	private String baseUrl;
 
-    public HttpTester(String url) {
+    public HttpTesterIdInURL(String url) {
         httpclient = HttpClients.createDefault();
         baseUrl = url;
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	HttpTester tester = new HttpTester("http://"+ args[0] + ":" + args[1] + "/");
+    	HttpTesterIdInURL tester = new HttpTesterIdInURL("http://"+ args[0] + ":" + args[1] + "/");
     	
         try 
         {
@@ -104,22 +107,25 @@ public class HttpTester {
 	private boolean successPost() throws Exception {
 		boolean res = false;
     	//Success POST
-        HttpPost postMethod = new HttpPost(baseUrl);
-        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1L)));
-        postMethod.setEntity(new UrlEncodedFormEntity(nvps));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1L))
+		        .build();
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.setEntity(new StringEntity(Long.toHexString(1L)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
             System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() != 200)
+            if(postResponse.getStatusLine().getStatusCode() == 201 || 
+        		postResponse.getStatusLine().getStatusCode() == 202)
             {
-            	res = false;
+            	res = true;
             }
             else
             {
-            	res = true;
+            	res = false;
             }
 
             HttpEntity postEntity = postResponse.getEntity();
@@ -134,22 +140,24 @@ public class HttpTester {
 	{
 		boolean res = false;
     	//Fail POST
-        HttpPost postMethod = new HttpPost(baseUrl);
-        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1L)));
-        postMethod.setEntity(new UrlEncodedFormEntity(nvps));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1L))
+		        .build();
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.setEntity(new StringEntity(Long.toHexString(1L)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
             System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() == 200)
+            if(postResponse.getStatusLine().getStatusCode() == 404)
             {
-            	res= false;
+            	res = true;
             }
             else
             {
-            	res =true;
+            	res = false;
             }
 
             HttpEntity postEntity = postResponse.getEntity();
@@ -165,12 +173,18 @@ public class HttpTester {
 		boolean res = false;
 		
 		//Success GET
-        HttpGet getMethod = new HttpGet(baseUrl+Long.toString(1L));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1L))
+		        .build();
+        HttpGet getMethod = new HttpGet(uri);
         CloseableHttpResponse getResponse = httpclient.execute(getMethod);
         try {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.equals(Long.toString(1L)))
+            if(getResponse.getStatusLine().getStatusCode() == 200 && 
+            		getEntity.equals(Long.toString(1L)))
             {
             	res = true;
             }
@@ -190,12 +204,19 @@ public class HttpTester {
 	{
 		boolean res = false;
 		//Fail GET
-        HttpGet getMethod = new HttpGet(baseUrl+Long.toString(2L));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(2L))
+		        .build();
+
+        HttpGet getMethod = new HttpGet(uri);
         CloseableHttpResponse getResponse = httpclient.execute(getMethod);
         try {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() != 200)
+            if(getResponse.getStatusLine().getStatusCode() == 404 ||
+        		getResponse.getStatusLine().getStatusCode() == 400)
             {
             	res = true;
             }
@@ -215,22 +236,26 @@ public class HttpTester {
 	{
 		boolean res = false;
     	//Success PUT
-        HttpPut putMethod = new HttpPut(baseUrl);
-        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1001L)));
-        putMethod.setEntity(new UrlEncodedFormEntity(nvps));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1L))
+		        .build();
+
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.setEntity(new StringEntity(Long.toHexString(1001L)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
             System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() != 200)
+            if(postResponse.getStatusLine().getStatusCode() == 200 ||
+               postResponse.getStatusLine().getStatusCode() == 204)
             {
-            	res = false;
+            	res = true;
             }
             else
             {
-            	res = true;
+            	res = false;
             }
 
             HttpEntity postEntity = postResponse.getEntity();
@@ -246,22 +271,25 @@ public class HttpTester {
 	{
 		boolean res = false;
     	//Fail PUT
-        HttpPut putMethod = new HttpPut(baseUrl);
-        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(2L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(2L)));
-        putMethod.setEntity(new UrlEncodedFormEntity(nvps));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(2L))
+		        .build();
+
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.setEntity(new StringEntity(Long.toHexString(2L)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
             System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() == 200)
+            if(postResponse.getStatusLine().getStatusCode() == 404)
             {
-            	res = false;
+            	res = true;
             }
             else
             {
-            	res = true;
+            	res = false;
             }
 
             HttpEntity postEntity = postResponse.getEntity();
@@ -277,12 +305,20 @@ public class HttpTester {
 	{
 		boolean res = false;
 		//Success DELETE
-        HttpDelete delMethod = new HttpDelete(baseUrl+Long.toString(1L));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1L))
+		        .build();
+
+        HttpDelete delMethod = new HttpDelete(uri);
         CloseableHttpResponse getResponse = httpclient.execute(delMethod);
         try {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() == 200)
+            if(getResponse.getStatusLine().getStatusCode() == 200 ||
+        		getResponse.getStatusLine().getStatusCode() == 202 ||
+        		getResponse.getStatusLine().getStatusCode() == 204)
             {
             	res = true;
             }
@@ -302,12 +338,18 @@ public class HttpTester {
 	{
 		boolean res = false;
 		//Fail DELETE
-        HttpDelete delMethod = new HttpDelete(baseUrl+Long.toString(2L));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(2L))
+		        .build();
+
+        HttpDelete delMethod = new HttpDelete(uri);
         CloseableHttpResponse getResponse = httpclient.execute(delMethod);
         try {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() != 200)
+            if(getResponse.getStatusLine().getStatusCode() == 404)
             {
             	res = true;
             }
@@ -336,11 +378,14 @@ public class HttpTester {
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
     	//Success POST
-        HttpPost postMethod = new HttpPost(baseUrl);
-        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1002L)));
-        nvps.add(new BasicNameValuePair("valor", longString));
-        postMethod.setEntity(new UrlEncodedFormEntity(nvps));
+		URI uri = new URIBuilder()
+		        .setScheme("http")
+		        .setHost(baseUrl)
+		        .setPath(Long.toString(1002L))
+		        .build();
+
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.setEntity(new StringEntity(longString));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
@@ -363,7 +408,7 @@ public class HttpTester {
         if(res)
         {
 			//Success GET
-	        HttpGet getMethod = new HttpGet(baseUrl+Long.toString(1002L));
+	        HttpGet getMethod = new HttpGet(uri);
 	        CloseableHttpResponse getResponse = httpclient.execute(getMethod);
 	        try {
 	            System.out.println(getResponse.getStatusLine());
@@ -383,5 +428,4 @@ public class HttpTester {
         }
 		return res;
 	}
-
 }

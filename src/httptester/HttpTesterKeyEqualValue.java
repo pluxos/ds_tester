@@ -31,65 +31,65 @@ import org.apache.http.util.EntityUtils;
  * This example demonstrates the use of the {@link ResponseHandler} to simplify
  * the process of processing the HTTP response and releasing associated resources.
  */
-public class HttpTester {
+public class HttpTesterKeyEqualValue {
     private CloseableHttpClient httpclient;
 	private String baseUrl;
 
-    public HttpTester(String url) {
+    public HttpTesterKeyEqualValue(String url) {
         httpclient = HttpClients.createDefault();
         baseUrl = url;
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	HttpTester tester = new HttpTester("http://"+ args[0] + ":" + args[1] + "/");
+    	HttpTesterKeyEqualValue tester = new HttpTesterKeyEqualValue("http://"+ args[0] + ":" + args[1] + "/");
     	
         try 
         {
         	if(tester.successPost())
-            	System.out.println("Success POST: passed!");
+            	System.err.println("Success POST: passed!");
         	else
-        		System.err.println("Success POST: failed!");
+        		System.out.println("Success POST: failed!");
 
         	if(tester.failPost())
-            	System.out.println("Fail POST: passed!");
+            	System.err.println("Fail POST: passed!");
         	else
-        		System.err.println("Fail POST: failed!");
+        		System.out.println("Fail POST: failed!");
 
         	
         	if(tester.successGet())
-            	System.out.println("Success GET: passed!");
+            	System.err.println("Success GET: passed!");
         	else
-        		System.err.println("Success GET: failed!");
+        		System.out.println("Success GET: failed!");
 
         	if(tester.failGet())
-            	System.out.println("Fail GET: passed!");
+            	System.err.println("Fail GET: passed!");
         	else
-        		System.err.println("Fail GET: failed!");
+        		System.out.println("Fail GET: failed!");
         	
         	if(tester.successPut())
-            	System.out.println("Success PUT: passed!");
+            	System.err.println("Success PUT: passed!");
         	else
-        		System.err.println("Success PUT: failed!");
+        		System.out.println("Success PUT: failed!");
 
         	if(tester.failPut())
-            	System.out.println("Fail PUT: passed!");
+            	System.err.println("Fail PUT: passed!");
         	else
-        		System.err.println("Fail PUT: failed!");
+        		System.out.println("Fail PUT: failed!");
         	
         	if(tester.successDelete())
-            	System.out.println("Success DELETE: passed!");
+            	System.err.println("Success DELETE: passed!");
         	else
-        		System.err.println("Success DELTE: failed!");
+        		System.out.println("Success DELTE: failed!");
 
         	if(tester.failDelete())
-            	System.out.println("Fail DELETE: passed!");
+            	System.err.println("Fail DELETE: passed!");
         	else
-        		System.err.println("Fail DELETE: failed!");
+        		System.out.println("Fail DELETE: failed!");
 
         	if(tester.successLongPostGet())
-            	System.out.println("Success long POST&GET: passed!");
+            	System.err.println("Success long POST&GET: passed!");
         	else
-        		System.err.println("Success long POST&GET: failed!");
+        		System.out.println("Success long POST&GET: failed!");
         	
         } finally {
             tester.close();
@@ -106,8 +106,7 @@ public class HttpTester {
     	//Success POST
         HttpPost postMethod = new HttpPost(baseUrl);
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1L)));
+        nvps.add(new BasicNameValuePair(Long.toString(1L), Long.toHexString(1L)));
         postMethod.setEntity(new UrlEncodedFormEntity(nvps));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
@@ -136,8 +135,7 @@ public class HttpTester {
     	//Fail POST
         HttpPost postMethod = new HttpPost(baseUrl);
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1L)));
+        nvps.add(new BasicNameValuePair(Long.toString(1L), Long.toHexString(1L)));
         postMethod.setEntity(new UrlEncodedFormEntity(nvps));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
@@ -217,8 +215,7 @@ public class HttpTester {
     	//Success PUT
         HttpPut putMethod = new HttpPut(baseUrl);
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(1001L)));
+        nvps.add(new BasicNameValuePair(Long.toString(1L), Long.toHexString(1001L)));
         putMethod.setEntity(new UrlEncodedFormEntity(nvps));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
@@ -248,8 +245,7 @@ public class HttpTester {
     	//Fail PUT
         HttpPut putMethod = new HttpPut(baseUrl);
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(2L)));
-        nvps.add(new BasicNameValuePair("valor", Long.toHexString(2L)));
+        nvps.add(new BasicNameValuePair(Long.toString(2L), Long.toHexString(2L)));
         putMethod.setEntity(new UrlEncodedFormEntity(nvps));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
@@ -325,9 +321,9 @@ public class HttpTester {
 	
 	private boolean successLongPostGet() throws Exception {
 		boolean res = false;
-		String longString = "0\n23456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
-							"0\r23456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
-							"0\r\n3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+		String longString = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
@@ -338,8 +334,7 @@ public class HttpTester {
     	//Success POST
         HttpPost postMethod = new HttpPost(baseUrl);
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("chave", Long.toString(1002L)));
-        nvps.add(new BasicNameValuePair("valor", longString));
+        nvps.add(new BasicNameValuePair(Long.toString(1002L), longString));
         postMethod.setEntity(new UrlEncodedFormEntity(nvps));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
@@ -368,12 +363,14 @@ public class HttpTester {
 	        try {
 	            System.out.println(getResponse.getStatusLine());
 	            HttpEntity getEntity = getResponse.getEntity();
-	            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.equals(longString))
+	            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.getContent().equals(longString))
 	            {
 	            	res = true;
 	            }
 	            else
 	            {
+	            	System.out.println("status:"+getResponse.getStatusLine());
+	            	System.out.println("entity:"+getEntity);
 	            	res = false;
 	            }
 	            EntityUtils.consume(getEntity);
