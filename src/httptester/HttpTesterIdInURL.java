@@ -41,7 +41,7 @@ public class HttpTesterIdInURL {
 	public final static void main(String[] args) throws Exception {
     	final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
     	
-        try 
+        try
         {
         	ExecutorService executor = Executors.newFixedThreadPool(100);
         	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
