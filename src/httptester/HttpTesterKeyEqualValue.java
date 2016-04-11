@@ -168,7 +168,8 @@ public class HttpTesterKeyEqualValue {
         try {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.equals(Long.toString(1L)))
+            if(getResponse.getStatusLine().getStatusCode() == 200 && 
+            		EntityUtils.toString(getEntity).equals(Long.toString(1L)))
             {
             	res = true;
             }
@@ -363,14 +364,15 @@ public class HttpTesterKeyEqualValue {
 	        try {
 	            System.out.println(getResponse.getStatusLine());
 	            HttpEntity getEntity = getResponse.getEntity();
-	            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.getContent().equals(longString))
+	            if(getResponse.getStatusLine().getStatusCode() == 200 && 
+	            		EntityUtils.toString(getEntity).equals(longString))
 	            {
 	            	res = true;
 	            }
 	            else
 	            {
 	            	System.out.println("status:"+getResponse.getStatusLine());
-	            	System.out.println("entity:"+getEntity);
+	            	System.out.println("entity:"+EntityUtils.toString(getEntity));
 	            	res = false;
 	            }
 	            EntityUtils.consume(getEntity);

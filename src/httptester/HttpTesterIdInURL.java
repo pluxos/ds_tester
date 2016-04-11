@@ -44,7 +44,7 @@ public class HttpTesterIdInURL {
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	HttpTesterIdInURL tester = new HttpTesterIdInURL("http://"+ args[0] + ":" + args[1] + "/");
+    	HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
     	
         try 
         {
@@ -113,7 +113,7 @@ public class HttpTesterIdInURL {
 		        .setPath(Long.toString(1L))
 		        .build();
         HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity(Long.toHexString(1L)));
+        postMethod.setEntity(new StringEntity("data="+Long.toHexString(1L)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
@@ -146,12 +146,12 @@ public class HttpTesterIdInURL {
 		        .setPath(Long.toString(1L))
 		        .build();
         HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity(Long.toHexString(1L)));
+        postMethod.setEntity(new StringEntity("data="+Long.toHexString(1L)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
             System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() == 404)
+            if(postResponse.getStatusLine().getStatusCode() == 400)
             {
             	res = true;
             }
@@ -184,12 +184,13 @@ public class HttpTesterIdInURL {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
             if(getResponse.getStatusLine().getStatusCode() == 200 && 
-            		getEntity.equals(Long.toString(1L)))
+            		EntityUtils.toString(getEntity).equals(Long.toString(1L)))
             {
             	res = true;
             }
             else
             {
+            	System.out.println(EntityUtils.toString(getEntity));
             	res = false;
             }
             EntityUtils.consume(getEntity);
@@ -243,7 +244,7 @@ public class HttpTesterIdInURL {
 		        .build();
 
         HttpPut putMethod = new HttpPut(uri);
-        putMethod.setEntity(new StringEntity(Long.toHexString(1001L)));
+        putMethod.setEntity(new StringEntity("data="+Long.toHexString(1001L)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
@@ -278,7 +279,7 @@ public class HttpTesterIdInURL {
 		        .build();
 
         HttpPut putMethod = new HttpPut(uri);
-        putMethod.setEntity(new StringEntity(Long.toHexString(2L)));
+        putMethod.setEntity(new StringEntity("data="+Long.toHexString(2L)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
@@ -367,9 +368,9 @@ public class HttpTesterIdInURL {
 	
 	private boolean successLongPostGet() throws Exception {
 		boolean res = false;
-		String longString = "0\n23456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
-							"0\r23456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
-							"0\r\n3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+		String longString = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
+							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
@@ -385,7 +386,7 @@ public class HttpTesterIdInURL {
 		        .build();
 
         HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity(longString));
+        postMethod.setEntity(new StringEntity("data="+longString));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
@@ -413,12 +414,14 @@ public class HttpTesterIdInURL {
 	        try {
 	            System.out.println(getResponse.getStatusLine());
 	            HttpEntity getEntity = getResponse.getEntity();
-	            if(getResponse.getStatusLine().getStatusCode() == 200 && getEntity.equals(longString))
+	            if(getResponse.getStatusLine().getStatusCode() == 200 && 
+	            		EntityUtils.toString(getEntity).equals(longString))
 	            {
 	            	res = true;
 	            }
 	            else
 	            {
+	            	System.out.println(EntityUtils.toString(getEntity));
 	            	res = false;
 	            }
 	            EntityUtils.consume(getEntity);
