@@ -2,22 +2,10 @@ package httptester;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -27,8 +15,15 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * This example demonstrates the use of the {@link ResponseHandler} to simplify
@@ -44,15 +39,45 @@ public class HttpTesterIdInURL {
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+    	final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
     	
         try 
         {
-        	if(tester.successPost())
-            	System.out.println("Success POST: passed!");
+        	ExecutorService executor = Executors.newFixedThreadPool(100);
+        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+        	for(long id = 0; id < 10000; id++)
+        	{
+        		final long myId = id;
+        		callables.add(new Callable<Boolean>(){
+        			public Boolean call() throws Exception {
+        				return tester.successPost(myId);
+        			}
+        		});        		
+        	}
+        	
+        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+        	boolean result = true;
+        	for(Future<Boolean> f : futures) {
+        		result = result && f.get();
+        		
+        		if(!result)
+        			break;
+        	}
+        	
+        	if(result)
+        		System.out.println("Success POST: passed!");
         	else
-        		System.err.println("Success POST: failed!");
+        		System.err.println("Success POST: failed!");        		
 
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
         	if(tester.failPost())
             	System.out.println("Fail POST: passed!");
         	else
@@ -104,16 +129,16 @@ public class HttpTesterIdInURL {
 		httpclient.close();
 	}
 
-	private boolean successPost() throws Exception {
+	private boolean successPost(long id) throws Exception {
 		boolean res = false;
     	//Success POST
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1L))
+		        .setPath(Long.toString(id))
 		        .build();
         HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity("data="+Long.toHexString(1L)));
+        postMethod.setEntity(new StringEntity("data="+Long.toHexString(id)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
