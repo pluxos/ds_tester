@@ -43,81 +43,273 @@ public class HttpTesterIdInURL {
     	
         try
         {
-        	ExecutorService executor = Executors.newFixedThreadPool(100);
-        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-        	for(long id = 0; id < 10000; id++)
         	{
-        		final long myId = id;
-        		callables.add(new Callable<Boolean>(){
-        			public Boolean call() throws Exception {
-        				return tester.successPost(myId);
-        			}
-        		});        		
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 10000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.successPost(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	        		System.out.println("Success POST: passed!");
+	        	else
+	        		System.err.println("Success POST: failed!");        		
+
         	}
         	
-        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-        	boolean result = true;
-        	for(Future<Boolean> f : futures) {
-        		result = result && f.get();
-        		
-        		if(!result)
-        			break;
+        	
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 10000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.failPost(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	        		System.out.println("Fail POST: passed!");
+	        	else
+	        		System.err.println("Fail POST: failed!");        		
+
+        	}
+
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 10000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.successGet(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+                	System.out.println("Success GET: passed!");
+            	else
+            		System.err.println("Success GET: failed!");
+
+        	}
+
+        	
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 10000; id < 20000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.failGet(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Fail GET: passed!");
+	        	else
+	        		System.err.println("Fail GET: failed!");
+
+        	}
+
+
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 10000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.successPut(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Success PUT: passed!");
+	        	else
+	        		System.err.println("Success PUT: failed!");
+
         	}
         	
-        	if(result)
-        		System.out.println("Success POST: passed!");
-        	else
-        		System.err.println("Success POST: failed!");        		
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 10000; id < 20000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.failPut(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Fail PUT: passed!");
+	        	else
+	        		System.err.println("Fail PUT: failed!");
 
+        	}
         	
-        	
-        	
-        	
-        	
-        	
-        	
-        	
-        	
-        	if(tester.failPost())
-            	System.out.println("Fail POST: passed!");
-        	else
-        		System.err.println("Fail POST: failed!");
 
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 10000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.successDelete(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Success DELETE: passed!");
+	        	else
+	        		System.err.println("Success DELTE: failed!");
+
+
+        	}
         	
-        	if(tester.successGet())
-            	System.out.println("Success GET: passed!");
-        	else
-        		System.err.println("Success GET: failed!");
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 10000; id < 20000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.failDelete(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Fail DELETE: passed!");
+	        	else
+	        		System.err.println("Fail DELETE: failed!");
 
-        	if(tester.failGet())
-            	System.out.println("Fail GET: passed!");
-        	else
-        		System.err.println("Fail GET: failed!");
+        	}
         	
-        	if(tester.successPut())
-            	System.out.println("Success PUT: passed!");
-        	else
-        		System.err.println("Success PUT: failed!");
 
-        	if(tester.failPut())
-            	System.out.println("Fail PUT: passed!");
-        	else
-        		System.err.println("Fail PUT: failed!");
+        	{
+	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 50000; id < 60000; id++)
+	        	{
+	        		final long myId = id;
+	        		callables.add(new Callable<Boolean>(){
+	        			public Boolean call() throws Exception {
+	        				return tester.successLongPostGet(myId);
+	        			}
+	        		});        		
+	        	}
+	        	
+	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
+	        	boolean result = true;
+	        	for(Future<Boolean> f : futures) {
+	        		result = result && f.get();
+	        		
+	        		if(!result)
+	        			break;
+	        	}
+	        	
+	        	if(result)
+	            	System.out.println("Success long POST&GET: passed!");
+	        	else
+	        		System.err.println("Success long POST&GET: failed!");
+        	}
         	
-        	if(tester.successDelete())
-            	System.out.println("Success DELETE: passed!");
-        	else
-        		System.err.println("Success DELTE: failed!");
 
-        	if(tester.failDelete())
-            	System.out.println("Fail DELETE: passed!");
-        	else
-        		System.err.println("Fail DELETE: failed!");
-
-        	if(tester.successLongPostGet())
-            	System.out.println("Success long POST&GET: passed!");
-        	else
-        		System.err.println("Success long POST&GET: failed!");
         	
         } finally {
             tester.close();
@@ -161,17 +353,17 @@ public class HttpTesterIdInURL {
         return res;
 	}
 
-	private boolean failPost() throws Exception
+	private boolean failPost(long myId) throws Exception
 	{
 		boolean res = false;
     	//Fail POST
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1L))
+		        .setPath(Long.toString(myId))
 		        .build();
         HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity("data="+Long.toHexString(1L)));
+        postMethod.setEntity(new StringEntity("data="+Long.toHexString(myId)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
@@ -193,7 +385,7 @@ public class HttpTesterIdInURL {
         return res;
 	}
 	
-	private boolean successGet() throws Exception
+	private boolean successGet(long myId) throws Exception
 	{
 		boolean res = false;
 		
@@ -201,7 +393,7 @@ public class HttpTesterIdInURL {
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1L))
+		        .setPath(Long.toString(myId))
 		        .build();
         HttpGet getMethod = new HttpGet(uri);
         CloseableHttpResponse getResponse = httpclient.execute(getMethod);
@@ -209,7 +401,7 @@ public class HttpTesterIdInURL {
             System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
             if(getResponse.getStatusLine().getStatusCode() == 200 && 
-            		EntityUtils.toString(getEntity).equals(Long.toString(1L)))
+            		EntityUtils.toString(getEntity).equals(Long.toString(myId)))
             {
             	res = true;
             }
@@ -226,14 +418,14 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean failGet() throws Exception
+	private boolean failGet(long myId) throws Exception
 	{
 		boolean res = false;
 		//Fail GET
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(2L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpGet getMethod = new HttpGet(uri);
@@ -258,18 +450,18 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean successPut() throws Exception
+	private boolean successPut(long myId) throws Exception
 	{
 		boolean res = false;
     	//Success PUT
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpPut putMethod = new HttpPut(uri);
-        putMethod.setEntity(new StringEntity("data="+Long.toHexString(1001L)));
+        putMethod.setEntity(new StringEntity("data="+Long.toHexString(-1*myId)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
@@ -293,18 +485,18 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean failPut() throws Exception
+	private boolean failPut(long myId) throws Exception
 	{
 		boolean res = false;
     	//Fail PUT
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(2L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpPut putMethod = new HttpPut(uri);
-        putMethod.setEntity(new StringEntity("data="+Long.toHexString(2L)));
+        putMethod.setEntity(new StringEntity("data="+Long.toHexString(myId)));
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
@@ -327,14 +519,14 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean successDelete() throws Exception
+	private boolean successDelete(long myId) throws Exception
 	{
 		boolean res = false;
 		//Success DELETE
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpDelete delMethod = new HttpDelete(uri);
@@ -360,14 +552,14 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean failDelete() throws Exception
+	private boolean failDelete(long myId) throws Exception
 	{
 		boolean res = false;
 		//Fail DELETE
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(2L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpDelete delMethod = new HttpDelete(uri);
@@ -391,7 +583,7 @@ public class HttpTesterIdInURL {
 		return res;
 	}
 	
-	private boolean successLongPostGet() throws Exception {
+	private boolean successLongPostGet(long myId) throws Exception {
 		boolean res = false;
 		String longString = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
 							"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"+
@@ -407,7 +599,7 @@ public class HttpTesterIdInURL {
 		URI uri = new URIBuilder()
 		        .setScheme("http")
 		        .setHost(baseUrl)
-		        .setPath(Long.toString(1002L))
+		        .setPath(Long.toString(myId))
 		        .build();
 
         HttpPost postMethod = new HttpPost(uri);
