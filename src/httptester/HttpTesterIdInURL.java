@@ -33,7 +33,7 @@ public class HttpTesterIdInURL {
     private CloseableHttpClient httpclient;
 	private String baseUrl;
 	
-	static int testLen = 50;
+	static int testLen = 1000;
 
     public HttpTesterIdInURL(String url) {
         httpclient = HttpClients.createDefault();
@@ -413,7 +413,7 @@ public class HttpTesterIdInURL {
             int statusCode = getResponse.getStatusLine().getStatusCode();
             String entityString = EntityUtils.toString(getEntity);
             if( (statusCode == 200 || statusCode == 302)&& 
-            	entityString.equals(Long.toString(myId)))
+            	entityString.equals(Long.toHexString(myId)))
             {
             	res = true;
             }
