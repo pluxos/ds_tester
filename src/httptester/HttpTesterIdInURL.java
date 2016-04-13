@@ -32,6 +32,8 @@ import java.util.concurrent.Future;
 public class HttpTesterIdInURL {
     private CloseableHttpClient httpclient;
 	private String baseUrl;
+	
+	static int testLen = 50;
 
     public HttpTesterIdInURL(String url) {
         httpclient = HttpClients.createDefault();
@@ -39,21 +41,21 @@ public class HttpTesterIdInURL {
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
     	
         try
         {
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
+
+        		ExecutorService executor = Executors.newFixedThreadPool(100);
 	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 0; id < 10000; id++)
+	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
 	        				return tester.successPost(myId);
 	        			}
-	        		});        		
+	        		});
 	        	}
 	        	
 	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
@@ -70,14 +72,16 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Success POST: failed!");        		
 
-        	}
-        	
-        	
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 0; id < 10000; id++)
+
+	        	
+	        	
+	        	
+	        	
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -86,8 +90,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -100,13 +104,15 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Fail POST: failed!");        		
 
-        	}
-
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 0; id < 10000; id++)
+	        	
+	        	
+	        	
+	        	
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -115,8 +121,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -129,14 +135,12 @@ public class HttpTesterIdInURL {
             	else
             		System.err.println("Success GET: failed!");
 
-        	}
 
-        	
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 10000; id < 20000; id++)
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -145,8 +149,11 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	
+	        	
+	        	
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -159,14 +166,12 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Fail GET: failed!");
 
-        	}
 
-
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 0; id < 10000; id++)
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -175,8 +180,11 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	
+	        	
+	        	
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -189,13 +197,11 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Success PUT: failed!");
 
-        	}
-        	
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 10000; id < 20000; id++)
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -204,8 +210,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -218,14 +224,16 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Fail PUT: failed!");
 
-        	}
-        	
 
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 0; id < 10000; id++)
+	        	
+	        	
+	        	
+	        	
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -234,8 +242,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -249,13 +257,15 @@ public class HttpTesterIdInURL {
 	        		System.err.println("Success DELTE: failed!");
 
 
-        	}
-        	
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 10000; id < 20000; id++)
+
+	        	
+	        	
+	        	
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -264,8 +274,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -278,14 +288,12 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Fail DELETE: failed!");
 
-        	}
-        	
 
-        	{
-	        	ExecutorService executor = Executors.newFixedThreadPool(100);
-	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-	        	for(long id = 50000; id < 60000; id++)
+	        	executor = Executors.newFixedThreadPool(100);
+	        	callables = new HashSet<Callable<Boolean>>(); 
+	        	for(long id = 5*testLen; id < 6*testLen; id++)
 	        	{
+	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -294,8 +302,8 @@ public class HttpTesterIdInURL {
 	        		});        		
 	        	}
 	        	
-	        	List<Future<Boolean>> futures = executor.invokeAll(callables);
-	        	boolean result = true;
+	        	futures = executor.invokeAll(callables);
+	        	result = true;
 	        	for(Future<Boolean> f : futures) {
 	        		result = result && f.get();
 	        		
@@ -307,12 +315,11 @@ public class HttpTesterIdInURL {
 	            	System.out.println("Success long POST&GET: passed!");
 	        	else
 	        		System.err.println("Success long POST&GET: failed!");
-        	}
-        	
+
 
         	
         } finally {
-            tester.close();
+            
         }
         
     }
@@ -334,7 +341,7 @@ public class HttpTesterIdInURL {
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
-            System.out.println(postResponse.getStatusLine());
+            //System.out.println(postResponse.getStatusLine());
             if(postResponse.getStatusLine().getStatusCode() == 201 || 
         		postResponse.getStatusLine().getStatusCode() == 202)
             {
@@ -366,14 +373,17 @@ public class HttpTesterIdInURL {
         postMethod.setEntity(new StringEntity("data="+Long.toHexString(myId)));
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
-        try {
-            System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() == 400)
+        try 
+        {
+        	int statusCode = postResponse.getStatusLine().getStatusCode();
+        	
+            if(statusCode == 400 || statusCode == 403)
             {
             	res = true;
             }
             else
             {
+            	System.out.println("code " + statusCode + "  " + myId);
             	res = false;
             }
 
@@ -398,16 +408,18 @@ public class HttpTesterIdInURL {
         HttpGet getMethod = new HttpGet(uri);
         CloseableHttpResponse getResponse = httpclient.execute(getMethod);
         try {
-            System.out.println(getResponse.getStatusLine());
+            //System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() == 200 && 
-            		EntityUtils.toString(getEntity).equals(Long.toString(myId)))
+            int statusCode = getResponse.getStatusLine().getStatusCode();
+            String entityString = EntityUtils.toString(getEntity);
+            if( (statusCode == 200 || statusCode == 302)&& 
+            	entityString.equals(Long.toString(myId)))
             {
             	res = true;
             }
             else
             {
-            	System.out.println(EntityUtils.toString(getEntity));
+            	System.out.println(entityString);
             	res = false;
             }
             EntityUtils.consume(getEntity);
@@ -431,10 +443,11 @@ public class HttpTesterIdInURL {
         HttpGet getMethod = new HttpGet(uri);
         CloseableHttpResponse getResponse = httpclient.execute(getMethod);
         try {
-            System.out.println(getResponse.getStatusLine());
+            //System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
-            if(getResponse.getStatusLine().getStatusCode() == 404 ||
-        		getResponse.getStatusLine().getStatusCode() == 400)
+            int statusCode = getResponse.getStatusLine().getStatusCode();
+            String entityString = EntityUtils.toString(getEntity);
+            if(statusCode == 404 || statusCode == 400)
             {
             	res = true;
             }
@@ -465,7 +478,7 @@ public class HttpTesterIdInURL {
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
-            System.out.println(postResponse.getStatusLine());
+            //System.out.println(postResponse.getStatusLine());
             if(postResponse.getStatusLine().getStatusCode() == 200 ||
                postResponse.getStatusLine().getStatusCode() == 204)
             {
@@ -500,7 +513,7 @@ public class HttpTesterIdInURL {
         CloseableHttpResponse postResponse = httpclient.execute(putMethod);
 
         try {
-            System.out.println(postResponse.getStatusLine());
+            //System.out.println(postResponse.getStatusLine());
             if(postResponse.getStatusLine().getStatusCode() == 404)
             {
             	res = true;
@@ -532,7 +545,7 @@ public class HttpTesterIdInURL {
         HttpDelete delMethod = new HttpDelete(uri);
         CloseableHttpResponse getResponse = httpclient.execute(delMethod);
         try {
-            System.out.println(getResponse.getStatusLine());
+            //System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
             if(getResponse.getStatusLine().getStatusCode() == 200 ||
         		getResponse.getStatusLine().getStatusCode() == 202 ||
@@ -565,7 +578,7 @@ public class HttpTesterIdInURL {
         HttpDelete delMethod = new HttpDelete(uri);
         CloseableHttpResponse getResponse = httpclient.execute(delMethod);
         try {
-            System.out.println(getResponse.getStatusLine());
+            //System.out.println(getResponse.getStatusLine());
             HttpEntity getEntity = getResponse.getEntity();
             if(getResponse.getStatusLine().getStatusCode() == 404)
             {
@@ -607,14 +620,15 @@ public class HttpTesterIdInURL {
         CloseableHttpResponse postResponse = httpclient.execute(postMethod);
 
         try {
-            System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() != 200)
+            //System.out.println(postResponse.getStatusLine());
+        	int statusCode = postResponse.getStatusLine().getStatusCode();
+            if(statusCode == 200 || statusCode == 201)
             {
-            	res = false;
+            	res = true;
             }
             else
             {
-            	res = true;
+            	res = false;
             }
 
             HttpEntity postEntity = postResponse.getEntity();
@@ -629,16 +643,17 @@ public class HttpTesterIdInURL {
 	        HttpGet getMethod = new HttpGet(uri);
 	        CloseableHttpResponse getResponse = httpclient.execute(getMethod);
 	        try {
-	            System.out.println(getResponse.getStatusLine());
 	            HttpEntity getEntity = getResponse.getEntity();
-	            if(getResponse.getStatusLine().getStatusCode() == 200 && 
-	            		EntityUtils.toString(getEntity).equals(longString))
+	            int statusCode = getResponse.getStatusLine().getStatusCode();
+	            String entityString = EntityUtils.toString(getEntity);
+	            if((statusCode == 200 || statusCode == 302)&& 
+	            		entityString.equals(longString))
 	            {
 	            	res = true;
 	            }
 	            else
 	            {
-	            	System.out.println(EntityUtils.toString(getEntity));
+	            	System.out.println(entityString);
 	            	res = false;
 	            }
 	            EntityUtils.consume(getEntity);
