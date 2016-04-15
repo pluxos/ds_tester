@@ -13,6 +13,8 @@ struct KeyValue {
 	3:version_t version
 }
 
+exception ValueIsTooLongException{ } 
+
 service LameDB
 {
 	//Retorna null caso chave não esteja no banco.
@@ -25,16 +27,16 @@ service LameDB
 	
 	//Caso a chave não exista no banco, insere par com version_t = 0 e retorna 0
 	//Caso a chave exista no banco, retorna a versão atual.
-	version_t put(1:key_t key, 2:value_t value)
+	version_t put(1:key_t key, 2:value_t value) throws (1:ValueIsTooLongException e)
 
 	//Caso a chave exista no banco, sobrescreve, incrementando a versão e retorna a nova versão
 	//Caso a chave não exista no banco, retorna -1 (versão inválida)
-	version_t update(1:key_t key, 2:value_t value)
+	version_t update(1:key_t key, 2:value_t value) throws (1:ValueIsTooLongException e)
 
 	//Caso a chave exista no banco, com a chave igual ao parâmetro version,
 	// sobrescreve, incrementando a versão e retorna a nova versão
 	//Caso a chave não exista no banco, retorna -1 (versão inválida)
-	version_t updateWithVersion(1:key_t key, 2:value_t value, 3:version_t version)
+	version_t updateWithVersion(1:key_t key, 2:value_t value, 3:version_t version) throws (1:ValueIsTooLongException e)
 
 	//Caso a chave exista no banco, remove o par e o retorna
 	//Caso a chave não exista no banco, retorna null
