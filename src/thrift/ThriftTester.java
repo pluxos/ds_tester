@@ -1,4 +1,17 @@
-package httptester;
+package thrift;
+
+
+
+import org.apache.thrift.TException;
+import org.apache.thrift.transport.TSSLTransportFactory;
+import org.apache.thrift.transport.TTransport;
+
+import lamedb.LameDB;
+
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
 
 
 import java.io.IOException;
@@ -29,27 +42,49 @@ import java.util.concurrent.Future;
  * This example demonstrates the use of the {@link ResponseHandler} to simplify
  * the process of processing the HTTP response and releasing associated resources.
  */
-public class HttpTesterIdInURL {
+public class ThriftTester {
     private CloseableHttpClient httpclient;
 	private String baseUrl;
 	
-	static int testLen = 1000;
+	static int testLen = 20;
+	private static LameDB.Client client;
 
-    public HttpTesterIdInURL(String url) {
-        httpclient = HttpClients.createDefault();
-        baseUrl = url;
+    public ThriftTester(String url) {
 	}
 
 	public final static void main(String[] args) throws Exception {
-    	
-        try
-        {
+	    try {
+	        TTransport transport;
+	        if (args[0].contains("simple")) {
+	          transport = new TSocket("localhost", 9090);
+	          transport.open();
+	        }
+	        else {
+	          /*
+	           * Similar to the server, you can use the parameters to setup client parameters or
+	           * use the default settings. On the client side, you will need a TrustStore which
+	           * contains the trusted certificate along with the public key. 
+	           * For this example it's a self-signed cert. 
+	           */
+	          TSSLTransportParameters params = new TSSLTransportParameters();
+	          params.setTrustStore("../../lib/java/test/.truststore", "thrift", "SunX509", "JKS");
+	          /*
+	           * Get a client transport instead of a server transport. The connection is opened on
+	           * invocation of the factory method, no need to specifically call open()
+	           */
+	          transport = TSSLTransportFactory.getClientSocket("localhost", 9091, 0, params);
+	        }
+
+	        TProtocol protocol = new  TBinaryProtocol(transport);
+	        client = new LameDB.Client(protocol);
+
+
 
         		ExecutorService executor = Executors.newFixedThreadPool(100);
 	        	Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -81,7 +116,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -104,6 +139,7 @@ public class HttpTesterIdInURL {
 	        	else
 	        		System.err.println("Fail POST: failed!");        		
 
+
 	        	
 	        	
 	        	
@@ -112,7 +148,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -140,7 +176,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -171,7 +207,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -201,7 +237,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -233,7 +269,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 0; id < 1*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -265,7 +301,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 1*testLen; id < 2*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -293,7 +329,7 @@ public class HttpTesterIdInURL {
 	        	callables = new HashSet<Callable<Boolean>>(); 
 	        	for(long id = 5*testLen; id < 6*testLen; id++)
 	        	{
-	        		final HttpTesterIdInURL tester = new HttpTesterIdInURL(args[0] + ":" + args[1]+"/");
+	        		final ThriftTester tester = new ThriftTester(args[0] + ":" + args[1]+"/");
 	        		final long myId = id;
 	        		callables.add(new Callable<Boolean>(){
 	        			public Boolean call() throws Exception {
@@ -317,11 +353,15 @@ public class HttpTesterIdInURL {
 	        		System.err.println("Success long POST&GET: failed!");
 
 
-        	
+
+	        	
+	        	
+	        	transport.close();
+		} catch (TException x) {
+		        x.printStackTrace();	
         } finally {
             
         }
-        
     }
 
 	private void close() throws IOException {
@@ -330,20 +370,12 @@ public class HttpTesterIdInURL {
 
 	private boolean successPost(long id) throws Exception {
 		boolean res = false;
-    	//Success POST
-		URI uri = new URIBuilder()
-		        .setScheme("http")
-		        .setHost(baseUrl)
-		        .setPath(Long.toString(id))
-		        .build();
-        HttpPost postMethod = new HttpPost(uri);
-        postMethod.setEntity(new StringEntity("data="+Long.toHexString(id)));
-        CloseableHttpResponse postResponse = httpclient.execute(postMethod);
-
+		client.put(id, Long.toHexString(id).getBytes());
+		
         try {
             //System.out.println(postResponse.getStatusLine());
-            if(postResponse.getStatusLine().getStatusCode() == 201 || 
-        		postResponse.getStatusLine().getStatusCode() == 202)
+        	int statusCode = postResponse.getStatusLine().getStatusCode();
+            if(statusCode == 201 || statusCode == 202 || statusCode == 200)
             {
             	res = true;
             }
@@ -377,7 +409,7 @@ public class HttpTesterIdInURL {
         {
         	int statusCode = postResponse.getStatusLine().getStatusCode();
         	
-            if(statusCode == 400 || statusCode == 403)
+            if(statusCode == 400 || statusCode == 403 || statusCode == 409)
             {
             	res = true;
             }
