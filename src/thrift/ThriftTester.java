@@ -1,7 +1,5 @@
 package thrift;
 
-
-
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.List;
@@ -11,12 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.http.client.ResponseHandler;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSSLTransportFactory;
-import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 
@@ -24,10 +19,6 @@ import lamedb.KeyValue;
 import lamedb.LameDB;
 import lamedb.lamedbConstants;
 
-/**
- * This example demonstrates the use of the {@link ResponseHandler} to simplify
- * the process of processing the HTTP response and releasing associated resources.
- */
 public class ThriftTester {
 
 	static int testLen = 20;
@@ -35,26 +26,8 @@ public class ThriftTester {
 
 	public final static void main(String[] args) throws Exception {
 		try {
-			TTransport transport;
-			if (args[0].contains("simple")) {
-				transport = new TSocket("localhost", 9090);
-				transport.open();
-			}
-			else {
-				/*
-				 * Similar to the server, you can use the parameters to setup client parameters or
-				 * use the default settings. On the client side, you will need a TrustStore which
-				 * contains the trusted certificate along with the public key. 
-				 * For this example it's a self-signed cert. 
-				 */
-				TSSLTransportParameters params = new TSSLTransportParameters();
-				params.setTrustStore("../../lib/java/test/.truststore", "thrift", "SunX509", "JKS");
-				/*
-				 * Get a client transport instead of a server transport. The connection is opened on
-				 * invocation of the factory method, no need to specifically call open()
-				 */
-				transport = TSSLTransportFactory.getClientSocket("localhost", 9091, 0, params);
-			}
+			TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+			transport.open();
 
 			TProtocol protocol = new  TBinaryProtocol(transport);
 			client = new LameDB.Client(protocol);
@@ -303,7 +276,11 @@ public class ThriftTester {
 			else
 				System.err.println("Fail REMOVE: failed!");
 
+			
+			
 
+			
+			
 			executor = Executors.newFixedThreadPool(100);
 			callables = new HashSet<Callable<Boolean>>(); 
 			for(long id = 5*testLen; id < 6*testLen; id++)
@@ -331,6 +308,68 @@ public class ThriftTester {
 			else
 				System.err.println("Success long PUT&GET: failed!");
 
+			
+			
+			
+			executor = Executors.newFixedThreadPool(100);
+			callables = new HashSet<Callable<Boolean>>(); 
+			for(long id = 6*testLen; id < 7*testLen; id++)
+			{
+				final ThriftTester tester = new ThriftTester();
+				final long myId = id;
+				callables.add(new Callable<Boolean>(){
+					public Boolean call() throws Exception {
+						return tester.successUpdateWithVersion(myId);
+					}
+				});        		
+			}
+
+			futures = executor.invokeAll(callables);
+			result = true;
+			for(Future<Boolean> f : futures) {
+				result = result && f.get();
+
+				if(!result)
+					break;
+			}
+
+			if(result)
+				System.out.println("Success long UPDATE WITH VERSION: passed!");
+			else
+				System.err.println("Success long UPDATE WITH VERSION: failed!");
+
+
+			
+			
+			
+			executor = Executors.newFixedThreadPool(100);
+			callables = new HashSet<Callable<Boolean>>(); 
+			for(long id = 7*testLen; id < 8*testLen; id++)
+			{
+				final ThriftTester tester = new ThriftTester();
+				final long myId = id;
+				callables.add(new Callable<Boolean>(){
+					public Boolean call() throws Exception {
+						return tester.successRemoveWithVersion(myId);
+					}
+				});        		
+			}
+
+			futures = executor.invokeAll(callables);
+			result = true;
+			for(Future<Boolean> f : futures) {
+				result = result && f.get();
+
+				if(!result)
+					break;
+			}
+
+			if(result)
+				System.out.println("Success long PUT&GET: passed!");
+			else
+				System.err.println("Success long PUT&GET: failed!");
+
+			
 			transport.close();
 		} catch (TException x) {
 			x.printStackTrace();	
@@ -385,6 +424,45 @@ public class ThriftTester {
 			return true;
 		else
 			return false;
+	}
+
+	private boolean successUpdateWithVersion(long id) throws Exception {
+		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
+		if(resp != 0)
+		{	
+			return false;
+		}
+		else
+		{		
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),0);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),1);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),2);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),3);
+			if(resp == 4)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	private boolean successRemoveWithVersion(long id) throws Exception {
+		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
+		if(resp == 0)
+		{	
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),0);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),1);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),2);
+			resp = client.updateWithVersion(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()),3);
+			if(resp == 4)
+			{
+				KeyValue resp1 = client.removeWithVersion(id,0);
+				if(resp1.version == 4 )//&& resp.value == id && resp.version == 0
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean failUpdate(long id) throws Exception 
