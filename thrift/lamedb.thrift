@@ -45,6 +45,6 @@ service LameDB
 
 	//Caso a chave exista no banco, com chave igual ao parâmetro version
 	//remove o par e o retorna
-	//Caso a chave não exista no banco, retorna null
+	//Caso a chave não exista no banco, retorna KeyValue com versao -1
 	KeyValue removeWithVersion(1:key_t key, 3:version_t version)
 }
