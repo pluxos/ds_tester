@@ -339,6 +339,31 @@ public class ThriftTester {
 				System.err.println("Success long UPDATE WITH VERSION: failed!");
 
 
+			executor = Executors.newFixedThreadPool(100);
+			callables = new HashSet<Callable<Boolean>>(); 
+			{
+				final ThriftTester tester = new ThriftTester();
+				callables.add(new Callable<Boolean>(){
+					public Boolean call() throws Exception {
+						return tester.getRange(7*testLen, 7*testLen);
+					}
+				});        		
+			}
+
+			futures = executor.invokeAll(callables);
+			result = true;
+			for(Future<Boolean> f : futures) {
+				result = result && f.get();
+
+				if(!result)
+					break;
+			}
+
+			if(result)
+				System.out.println("Success long REMOVE WITH VERSION: passed!");
+			else
+				System.err.println("Success long REMOVE WITH VERSION: failed!");
+
 			
 			
 			
@@ -365,10 +390,15 @@ public class ThriftTester {
 			}
 
 			if(result)
-				System.out.println("Success long PUT&GET: passed!");
+				System.out.println("Success long REMOVE WITH VERSION: passed!");
 			else
-				System.err.println("Success long PUT&GET: failed!");
+				System.err.println("Success long REMOVE WITH VERSION: failed!");
 
+
+			
+			
+
+			
 			
 			transport.close();
 		} catch (TException x) {
@@ -409,10 +439,20 @@ public class ThriftTester {
 			return false;
 	}
 
+	
 	private boolean failGet(long id) throws Exception
 	{
 		KeyValue resp = client.get(id);
 		if(resp.version == -1)
+			return true;
+		else
+			return false;
+	}
+
+	private boolean getRange(long idl, long idr) throws Exception 
+	{
+		List<KeyValue> resp = client.getRange(idl,idr);
+		if(resp.size() == testLen) //&& resp.value == id && resp.version == 0
 			return true;
 		else
 			return false;
