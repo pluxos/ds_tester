@@ -544,7 +544,7 @@ public class ThriftTester {
 		{
 			KeyValue data2 = client.get(id);
 			if(data2.version == 0)
-				if(data2.value.equals(data))
+				if(data2.value.equals(ByteBuffer.wrap(data)))
 					return true;
 		}
 		return false;
