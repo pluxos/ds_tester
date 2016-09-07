@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -17,398 +16,460 @@ import org.apache.thrift.transport.TTransport;
 
 import lamedb.KeyValue;
 import lamedb.LameDB;
+import lamedb.LameDB.Client;
 import lamedb.lamedbConstants;
 
 public class ThriftTester {
 
-	static int testLen = 20;
-	private static LameDB.Client client;
+	private int testLen = 1;
+	private String[] args;
 
 	public final static void main(String[] args) throws Exception {
-		try {
-			TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
-			transport.open();
-
-			TProtocol protocol = new  TBinaryProtocol(transport);
-			client = new LameDB.Client(protocol);
-
-			ExecutorService executor = Executors.newFixedThreadPool(100);
-			Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 0; id < 1*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successPost(myId);
-					}
-				});
-			}
-
-			List<Future<Boolean>> futures = executor.invokeAll(callables);
-			boolean result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success PUT: passed!");
-			else
-				System.err.println("Success PUT: failed!");        		
-
-
-
-
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 0; id < 1*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.failPost(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Fail PUT: passed!");
-			else
-				System.err.println("Fail PUT: failed!");        		
-
-
-
-
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 0; id < 1*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successGet(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success GET: passed!");
-			else
-				System.err.println("Success GET: failed!");
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 1*testLen; id < 2*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.failGet(myId);
-					}
-				});        		
-			}
-
-
-
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Fail GET: passed!");
-			else
-				System.err.println("Fail GET: failed!");
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 0; id < 1*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successUpdate(myId);
-					}
-				});        		
-			}
-
-
-
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success UPDATE: passed!");
-			else
-				System.err.println("Success UPDATE: failed!");
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 1*testLen; id < 2*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.failUpdate(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Fail UPDATE: passed!");
-			else
-				System.err.println("Fail UPDATE: failed!");
-
-
-
-
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 0; id < 1*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successRemove(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success REMOVE: passed!");
-			else
-				System.err.println("Success REMOVE: failed!");
-
-
-
-
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 1*testLen; id < 2*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.failRemove(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Fail REMOVE: passed!");
-			else
-				System.err.println("Fail REMOVE: failed!");
-
-			
-			
-
-			
-			
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 5*testLen; id < 6*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successLongPostGet(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success long PUT&GET: passed!");
-			else
-				System.err.println("Success long PUT&GET: failed!");
-
-			
-			
-			
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 6*testLen; id < 7*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successUpdateWithVersion(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success long UPDATE WITH VERSION: passed!");
-			else
-				System.err.println("Success long UPDATE WITH VERSION: failed!");
-
-
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			{
-				final ThriftTester tester = new ThriftTester();
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.getRange(7*testLen, 7*testLen);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success long REMOVE WITH VERSION: passed!");
-			else
-				System.err.println("Success long REMOVE WITH VERSION: failed!");
-
-			
-			
-			
-			executor = Executors.newFixedThreadPool(100);
-			callables = new HashSet<Callable<Boolean>>(); 
-			for(long id = 7*testLen; id < 8*testLen; id++)
-			{
-				final ThriftTester tester = new ThriftTester();
-				final long myId = id;
-				callables.add(new Callable<Boolean>(){
-					public Boolean call() throws Exception {
-						return tester.successRemoveWithVersion(myId);
-					}
-				});        		
-			}
-
-			futures = executor.invokeAll(callables);
-			result = true;
-			for(Future<Boolean> f : futures) {
-				result = result && f.get();
-
-				if(!result)
-					break;
-			}
-
-			if(result)
-				System.out.println("Success long REMOVE WITH VERSION: passed!");
-			else
-				System.err.println("Success long REMOVE WITH VERSION: failed!");
-
-
-			
-			
-
-			
-			
-			transport.close();
-		} catch (TException x) {
-			x.printStackTrace();	
-		} finally {
-
-		}
+		ThriftTester tester = new ThriftTester(args);
+		tester.doTests();
 	}
 
-	private boolean successPost(long id) throws Exception {
+
+
+	
+	public ThriftTester(String[] args2)
+	{
+		this.args = args2;
+	}
+	
+	public void doTests(){
+		try
+		{
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					failGet(0, client);
+					successPost(myId,client);
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successPost(myId,client);
+						}
+					});
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success PUT: passed!");
+				else
+					System.err.println("Success PUT: failed!");        		
+			}
+	
+	
+	
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return failPost(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Fail PUT: passed!");
+				else
+					System.err.println("Fail PUT: failed!");        		
+	
+			}
+	
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successGet(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success GET: passed!");
+				else
+					System.err.println("Success GET: failed!");
+			}
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return failGet(myId, client);
+						}
+					});        		
+				}
+	
+	
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Fail GET: passed!");
+				else
+					System.err.println("Fail GET: failed!");
+			}
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successUpdate(myId, client);
+						}
+					});        		
+				}
+	
+	
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;			
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success UPDATE: passed!");
+				else
+					System.err.println("Success UPDATE: failed!");
+			}
+			
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return failUpdate(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Fail UPDATE: passed!");
+				else
+					System.err.println("Fail UPDATE: failed!");
+			}
+	
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successRemove(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success REMOVE: passed!");
+				else
+					System.err.println("Success REMOVE: failed!");
+			}
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return failRemove(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Fail REMOVE: passed!");
+				else
+					System.err.println("Fail REMOVE: failed!");
+			}
+				
+				
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successLongPostGet(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success long PUT&GET: passed!");
+				else
+					System.err.println("Success long PUT&GET: failed!");
+			}
+				
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successUpdateWithVersion(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success long UPDATE WITH VERSION: passed!");
+				else
+					System.err.println("Success long UPDATE WITH VERSION: failed!");
+			}
+	
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return getRange(7*testLen, 7*testLen, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success long REMOVE WITH VERSION: passed!");
+				else
+					System.err.println("Success long REMOVE WITH VERSION: failed!");
+			}
+				
+			{			
+				ExecutorService executor = Executors.newFixedThreadPool(100);
+				Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>(); 
+				for(long id = 0; id < 1*testLen; id++)
+				{
+					TTransport transport = new TSocket(args[0], Integer.parseInt(args[1]));
+					transport.open();
+	
+					TProtocol protocol = new  TBinaryProtocol(transport);
+					final Client client = new LameDB.Client(protocol);
+	
+					final long myId = id;
+					
+					callables.add(new Callable<Boolean>(){
+						public Boolean call() throws Exception {
+							return successRemoveWithVersion(myId, client);
+						}
+					});        		
+				}
+	
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				boolean result = true;
+				for(Future<Boolean> f : futures) {
+					result = result && f.get();
+	
+					if(!result)
+						break;
+				}
+	
+				if(result)
+					System.out.println("Success long REMOVE WITH VERSION: passed!");
+				else
+					System.err.println("Success long REMOVE WITH VERSION: failed!");
+	
+			}
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+						
+	}
+
+	private boolean successPost(long id, Client client) throws Exception {
 		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp == 0)
 			return true;
@@ -420,7 +481,7 @@ public class ThriftTester {
 	 * A especificacao atual nao permite diferenciar sucesso de insercao
 	 * com falha em que o dado estava na versao 0.
 	 */
-	private boolean failPost(long id) throws Exception 
+	private boolean failPost(long id, Client client) throws Exception 
 	{
 		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp == 0)
@@ -430,7 +491,7 @@ public class ThriftTester {
 	}
 
 
-	private boolean successGet(long id) throws Exception 
+	private boolean successGet(long id, Client client) throws Exception 
 	{
 		KeyValue resp = client.get(id);
 		if(resp.key == 0) //&& resp.value == id && resp.version == 0
@@ -440,7 +501,7 @@ public class ThriftTester {
 	}
 
 	
-	private boolean failGet(long id) throws Exception
+	private boolean failGet(long id, Client client) throws Exception
 	{
 		KeyValue resp = client.get(id);
 		if(resp.version == -1)
@@ -449,7 +510,7 @@ public class ThriftTester {
 			return false;
 	}
 
-	private boolean getRange(long idl, long idr) throws Exception 
+	private boolean getRange(long idl, long idr, Client client) throws Exception 
 	{
 		List<KeyValue> resp = client.getRange(idl,idr);
 		if(resp.size() == testLen) //&& resp.value == id && resp.version == 0
@@ -458,7 +519,7 @@ public class ThriftTester {
 			return false;
 	}
 
-	private boolean successUpdate(long id) throws Exception {
+	private boolean successUpdate(long id, Client client) throws Exception {
 		int resp = client.update(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp == 1)
 			return true;
@@ -466,7 +527,7 @@ public class ThriftTester {
 			return false;
 	}
 
-	private boolean successUpdateWithVersion(long id) throws Exception {
+	private boolean successUpdateWithVersion(long id, Client client) throws Exception {
 		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp != 0)
 		{	
@@ -485,7 +546,7 @@ public class ThriftTester {
 		}
 	}
 
-	private boolean successRemoveWithVersion(long id) throws Exception {
+	private boolean successRemoveWithVersion(long id, Client client) throws Exception {
 		int resp = client.put(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp == 0)
 		{	
@@ -505,7 +566,7 @@ public class ThriftTester {
 		return false;
 	}
 
-	private boolean failUpdate(long id) throws Exception 
+	private boolean failUpdate(long id, Client client) throws Exception 
 	{
 		int resp = client.update(id, ByteBuffer.wrap(Long.toHexString(id).getBytes()));
 		if(resp == -1)
@@ -515,7 +576,7 @@ public class ThriftTester {
 	}
 
 
-	private boolean successRemove(long id) throws Exception
+	private boolean successRemove(long id, Client client) throws Exception
 	{
 		KeyValue resp = client.remove(id);
 		if(resp.version == 1) // && data
@@ -524,7 +585,7 @@ public class ThriftTester {
 			return false;
 	}
 
-	private boolean failRemove(long id) throws Exception 
+	private boolean failRemove(long id, Client client) throws Exception 
 	{
 		KeyValue resp = client.remove(id);
 		if(resp.version == -1)
@@ -536,7 +597,7 @@ public class ThriftTester {
 
 
 
-	private boolean successLongPostGet(long id) throws Exception 
+	private boolean successLongPostGet(long id, Client client) throws Exception 
 	{
 		byte [] data = new byte[lamedbConstants.MAX_VALUE_LEN];
 		int resp = client.put(id, ByteBuffer.wrap(data));
